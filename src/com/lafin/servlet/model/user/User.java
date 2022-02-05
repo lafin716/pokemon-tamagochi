@@ -1,11 +1,10 @@
-package com.lafin.servlet.model;
+package com.lafin.servlet.model.user;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class User {
 
-    private Long id;
+    private int id;
 
     private String email;
 
@@ -25,32 +24,40 @@ public class User {
         return user;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getEmail() {
         return email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
     public void setCreatedAt(Date createdAt) {
