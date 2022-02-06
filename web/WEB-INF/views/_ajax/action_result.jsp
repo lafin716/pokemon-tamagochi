@@ -9,6 +9,7 @@
 
   UserPokemon userPokemon = (UserPokemon) request.getAttribute("userPokemon");
   int level = userPokemon.getLevel();
+  int exp = userPokemon.getExp();
   int hungry = userPokemon.getHungry();
   int happy = userPokemon.getHapiness();
   String pokemonCode = userPokemon.getPokemonCode();
@@ -20,9 +21,11 @@
   let happy = '<%= happy%>';
   let say = '<%= say%>';
   let level = '<%= level%>';
+  let exp = '<%= exp%>';
   let pokemonCode = '<%= pokemonCode%>';
 
   parent.updateLevel(level);
+  parent.updateExp(exp);
   parent.updatePokemon(pokemonCode);
   parent.changeStatus(status, statusText, hungry, happy);
   parent.talk(say);

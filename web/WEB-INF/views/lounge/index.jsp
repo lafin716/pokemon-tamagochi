@@ -23,6 +23,7 @@
     <div class="info-box">
         <div>배고픔 : <span class="hungry-label">0</span></div>
         <div>행복 : <span class="happy-label">0</span></div>
+        <div>경험치 : <span class="exp-label">0</span></div>
     </div>
     <div class="menu-box">
         <a href="#" class="btn-feed">밥 주기</a><br>
@@ -47,6 +48,7 @@
     var STATUS_MESSAGE = '<%= statusText%>';
     var INIT_SAY = '<%= initSay%>';
     var LEVEL = '<%= mainPokemon.getLevel()%>';
+    var EXP = '<%= mainPokemon.getExp()%>';
     var HUNGRY = '<%= mainPokemon.getHungry()%>';
     var HAPPY = '<%= mainPokemon.getHapiness()%>';
 </script>

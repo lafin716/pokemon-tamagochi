@@ -133,6 +133,7 @@ public class UserPokemonPersistence {
 
         var result = dbUtil.select(sql.toString());
         if (Objects.isNull(result)) {
+            dbUtil.resultSetClose();
             return null;
         }
 

@@ -47,6 +47,7 @@ public class ActionService {
         hungry = limitAmount(hungry - EAT);
 
         if (hungry <= 0) {
+            actionResult.setStatus(PokemonStatus.SICK);
             actionResult.setSay(PokemonSay.TOO_FULL);
         } else if (hungry <= 20) {
             actionResult.setSay(PokemonSay.FULL);
@@ -108,6 +109,13 @@ public class ActionService {
         // 배고픔 계산
         var hungry = userPokemon.getHungry();
         hungry = limitAmount(hungry + WORKOUT);
+
+        if (hungry <= 0) {
+            actionResult.setStatus(PokemonStatus.SICK);
+        } else if (hungry >= 80) {
+            actionResult.setStatus(PokemonStatus.HUNGRY);
+            actionResult.setSay(PokemonSay.HUNGRY);
+        }
 
         var levelUpUserPokemon = levelService.exp(userPokemon, WORKOUT_EXP);
         var revolution = revolutionService.revolution(levelUpUserPokemon);

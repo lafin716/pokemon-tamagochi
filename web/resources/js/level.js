@@ -1,17 +1,23 @@
 ﻿
 const levelLabel = document.querySelector('.level-label');
+const expLabel = document.querySelector('.exp-label');
 const pokemonImage = document.querySelector('.pokemon');
 
 const SECOND_LEVEL = 5;
-const THIRD_LEVEL = 10;
+const THIRD_LEVEL = 7;
 
 function initLevel() {
+   updateExp(EXP);
    resizePokemon(LEVEL);
 }
 
 function updateLevel(level) {
    resizePokemon(level);
    levelLabel.innerHTML = level;
+}
+
+function updateExp(exp) {
+   expLabel.innerHTML = exp;
 }
 
 function resizePokemon(level) {
