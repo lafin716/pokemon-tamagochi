@@ -4,19 +4,21 @@ import java.sql.*;
 
 public class DBUtil {
 
+    private Connection conn = null;
+
+    private Statement stmt = null;
+
+    private ResultSet rs = null;
+
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/user";
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/pokemon_tamagochi";
 
-    private static final String USERNAME = "test_user";
+    private static final String USERNAME = "pokemon";
 
-    private static final String PASSWORD = "test";
+    private static final String PASSWORD = "poke12#$";
 
-    public static ResultSet select(String sql) {
-        Connection conn = null;
-        Statement stmt = null;
-        ResultSet rs = null;
-
+    public ResultSet select(String sql) {
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
@@ -40,16 +42,16 @@ public class DBUtil {
         return null;
     }
 
-    public static boolean insert(String sql) {
-        Connection conn = null;
-        Statement stmt = null;
+    public boolean insert(String sql) {
+        var result = false;
 
         try {
             Class.forName(JDBC_DRIVER);
             conn = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
             stmt = conn.createStatement();
+            result = stmt.execute(sql);
 
-            return stmt.execute(sql);
+            return result;
         } catch(Exception ex) {
             ex.printStackTrace();
             try {
@@ -63,6 +65,30 @@ public class DBUtil {
             conn = null;
         }
 
-        return false;
+        return result;
+    }
+
+    public void resultSetClose() {
+        try {
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            rs = null;
+            stmt = null;
+            conn = null;
+        }
+    }
+
+    public void insertClose() {
+        try {
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            stmt = null;
+            conn = null;
+        }
     }
 }

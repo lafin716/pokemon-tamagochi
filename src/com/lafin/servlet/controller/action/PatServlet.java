@@ -16,9 +16,11 @@ public class PatServlet extends ActionServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         super.doPost(req, resp);
-        var result = actionService.pat();
-        req.setAttribute("actionResult", result);
+        var result = actionService.pat(userPokemonId);
+        var userPokemon = userService.getPokemon(userPokemonId);
 
+        req.setAttribute("actionResult", result);
+        req.setAttribute("userPokemon", userPokemon);
         print("/_ajax/action_result");
     }
 }

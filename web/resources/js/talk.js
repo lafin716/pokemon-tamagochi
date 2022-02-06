@@ -1,6 +1,8 @@
-﻿var chitChatScheduler;
+﻿let chitChatScheduler;
+
+const CHITCHAT_CYCLE = 15000;
+
 const talkBox = document.querySelector('.talk-box');
-const GREETING = '안녕!';
 const CHITCHATS = [
   '오늘 하루는 어땠어?',
   '난 항상 심심해',
@@ -10,28 +12,26 @@ const CHITCHATS = [
   '나도 인간이 되고싶어',
 ];
 
-function talk(message) {
-    // delayChitChat();
-    talkPrint(message);
+function initSay() {
+    talk(INIT_SAY);
 }
 
-function greeting(username) {
-    let message = GREETING + ' <span class="special">' + username + '</span> ';
+function talk(message) {
     talkPrint(message);
 }
 
 function startChitChat() {
-    clearInterval(chitChatScheduler);
-    chitChatScheduler = setInterval(chitChatSomething, 15000);
+    if (!isAlive()) {
+        return false;
+    }
+    stopChitChat();
+    console.log('talk start');
+    chitChatScheduler = setInterval(chitChatSomething, CHITCHAT_CYCLE);
 }
 
 function stopChitChat() {
+    console.log('talk stop');
     clearInterval(chitChatScheduler);
-}
-
-function delayChitChat() {
-    clearInterval(chitChatScheduler);
-    setTimeout(startChitChat, 5000);
 }
 
 function chitChatSomething() {

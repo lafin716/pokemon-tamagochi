@@ -14,6 +14,10 @@ public class UserPokemon {
 
     private String pokemonCode;
 
+    private int level;
+
+    private int exp;
+
     private boolean main;
 
     private PokemonStatus status;
@@ -50,6 +54,22 @@ public class UserPokemon {
 
     public void setPokemonId(int pokemonId) {
         this.pokemonId = pokemonId;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
     }
 
     public boolean isMain() {

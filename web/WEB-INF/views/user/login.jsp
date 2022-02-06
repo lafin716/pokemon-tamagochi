@@ -7,10 +7,22 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+<div class="login-box">
     <h1>로그인</h1>
     <form name="loginForm" action="/user/login" method="post">
-        이메일 : <input type="text" name="email" value=""><br>
-        비밀번호 : <input type="password" name="password" value=""><br>
-        <a href="/user/regist">아직 회원이 아니신가요?</a>
-        <button type="submit">로그인</button>
+        <div class="form-row">
+            <span>이메일</span>
+            <input type="text" name="email" value="">
+        </div>
+        <div class="form-row">
+            <span>비밀번호</span>
+            <input type="password" name="password" value="">
+        </div>
+        <div class="form-row">
+            <a href="/user/regist">아직 회원이 아니신가요?</a>
+        </div>
+        <div class="form-row">
+            <button type="submit" class="btn-login">로그인</button>
+        </div>
     </form>
+</div>

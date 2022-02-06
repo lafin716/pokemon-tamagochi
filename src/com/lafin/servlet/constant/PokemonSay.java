@@ -2,12 +2,14 @@ package com.lafin.servlet.constant;
 
 public enum PokemonSay {
     GREETING("안녕!"),
+    SLIENT("(적막이 흐른다..)"),
     HUNGRY("배고프다... 밥 먹고싶어"),
     EAT("너무 맛있어! 정말 고마워~ \\^0 \\^"),
     FULL("아 너무 배부르다"),
     TOO_FULL("그...그만... 더는.."),
     WORKOUT("헉..헉.. 살 좀 빠진거 같아?"),
     DIGEST("소화가 되고있는거 같아~"),
+    BORED("조금 심심해지는거 같아.."),
     SICK("나 아픈거 같아.."),
     LONELY("외로워..."),
     GOOD("기분이 좋아진다 >0 <"),

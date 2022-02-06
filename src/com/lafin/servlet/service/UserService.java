@@ -12,6 +12,10 @@ import java.util.List;
 
 public class UserService {
 
+    private final int DEFAULT_HUNGRY = 50;
+
+    private final int DEFAULT_HAPPY = 50;
+
     private PokemonPersistence pokemonPersistence;
 
     private UserPersistence userPersistence;
@@ -22,10 +26,6 @@ public class UserService {
         userPersistence = new UserPersistence();
         pokemonPersistence = new PokemonPersistence();
         userPokemonPersistence = new UserPokemonPersistence();
-    }
-
-    public List<User> getUsers() {
-        return userPersistence.getUsers();
     }
 
     public User getUser(int userId) {
@@ -59,8 +59,8 @@ public class UserService {
         userPokemon.setNickName(nickname);
         userPokemon.setStatus(PokemonStatus.NORMAL);
         userPokemon.setMain(isMain);
-        userPokemon.setHapiness(50);
-        userPokemon.setHungry(100);
+        userPokemon.setHapiness(DEFAULT_HAPPY);
+        userPokemon.setHungry(DEFAULT_HUNGRY);
         userPokemon.setCatchedAt(LocalDateTime.now());
 
         return userPokemonPersistence.addPokemon(userPokemon);
@@ -68,5 +68,9 @@ public class UserService {
 
     public UserPokemon getMainPokemon(int userId) {
         return userPokemonPersistence.getMainPokemon(userId);
+    }
+
+    public UserPokemon getPokemon(int userPokemonId) {
+        return userPokemonPersistence.getUserPokemon(userPokemonId);
     }
 }

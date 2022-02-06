@@ -11,6 +11,7 @@ import java.util.Objects;
 public class PokemonPersistence {
 
     public List<Pokemon> getPokemonByIds(List<String> ids) {
+        var dbUtil = new DBUtil();
 
         try {
             StringBuilder sql = new StringBuilder();
@@ -18,9 +19,11 @@ public class PokemonPersistence {
             sql.append("WHERE id in ( ");
             sql.append(String.join(", ", ids));
             sql.append(")");
+            System.out.println(sql);
 
-            var resultSet = DBUtil.select(sql.toString());
+            var resultSet = dbUtil.select(sql.toString());
             if (Objects.isNull(resultSet)) {
+                dbUtil.resultSetClose();
                 return null;
             }
 
@@ -35,26 +38,32 @@ public class PokemonPersistence {
                 pokemons.add(pokemon);
             }
 
+            dbUtil.resultSetClose();
             return pokemons;
         } catch (SQLException e) {
             e.printStackTrace();
+            dbUtil.resultSetClose();
             return null;
         }
     }
 
     public Pokemon getPokemonById(int id) {
+        var dbUtil = new DBUtil();
 
         try {
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT * FROM tb_pokemon ");
             sql.append("WHERE id = ");
             sql.append(id);
+            System.out.println(sql);
 
             var pokemon = new Pokemon();
-            var resultSet = DBUtil.select(sql.toString());
+            var resultSet = dbUtil.select(sql.toString());
             if (Objects.isNull(resultSet)) {
+                dbUtil.resultSetClose();
                 return null;
             }
+
             if (resultSet.next()) {
                 pokemon.setId(resultSet.getInt("id"));
                 pokemon.setSerialNumber(resultSet.getString("serialNumber"));
@@ -62,9 +71,11 @@ public class PokemonPersistence {
                 pokemon.setPokemonType(resultSet.getString("pokemonType"));
             }
 
+            dbUtil.resultSetClose();
             return pokemon;
         } catch (SQLException e) {
             e.printStackTrace();
+            dbUtil.resultSetClose();
             return null;
         }
     }

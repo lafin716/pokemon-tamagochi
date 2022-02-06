@@ -16,5 +16,7 @@ public class AbandonServlet extends ActionServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         super.doPost(req, resp);
+        actionService.abandon(userPokemonId);
+        redirect("/");
     }
 }

@@ -8,73 +8,173 @@ import com.lafin.servlet.persistence.UserPokemonPersistence;
 
 public class ActionService {
 
-    private final int HUNGRY_AMOUNT = 10;
+    private final int EAT = 5;
 
-    private final int FOOD_HAPPY_AMOUNT = 3;
+    private final int WORKOUT = 10;
 
-    private final int PAT_HAPPY_AMOUNT = 5;
+    private final int PAT = 5;
 
-    private final int DIGEST_AMOUNT = 10;
+    private final int DIGEST = 3;
+
+    private final int BORING = 3;
+
+    private final int EAT_EXP = 1;
+
+    private final int WORKOUT_EXP = 5;
+
+    private final int PAT_EXP = 1;
 
     private UserPokemonPersistence userPokemonPersistence;
 
-    private UserPokemon userPokemon;
+    private LevelService levelService;
+
+    private RevolutionService revolutionService;
 
     public ActionService() {
         userPokemonPersistence = new UserPokemonPersistence();
+        levelService = new LevelService();
+        revolutionService = new RevolutionService();
     }
 
-    public void init(int userPokemonId) {
-        userPokemon = userPokemonPersistence.getUserPokemon(userPokemonId);
-    }
-
-    public ActionResult feed() {
+    public ActionResult feed(int userPokemonId) {
+        var userPokemon = userPokemonPersistence.getUserPokemon(userPokemonId);
+        var actionResult = new ActionResult();
+        actionResult.setStatus(PokemonStatus.NORMAL);
+        actionResult.setSay(PokemonSay.EAT);
 
         // 배고픔 계산
         var hungry = userPokemon.getHungry();
-        hungry = limitAmount(hungry - HUNGRY_AMOUNT);
+        hungry = limitAmount(hungry - EAT);
 
-        var result = calculateHungry(hungry, PokemonSay.EAT);
+        if (hungry <= 0) {
+            actionResult.setSay(PokemonSay.TOO_FULL);
+        } else if (hungry <= 20) {
+            actionResult.setSay(PokemonSay.FULL);
+        } else if (hungry >= 100) {
+            actionResult.setStatus(PokemonStatus.DEAD);
+            actionResult.setSay(PokemonSay.DIE);
+        }
+
+        var levelUpUserPokemon = levelService.exp(userPokemon, EAT_EXP);
+        var revolution = revolutionService.revolution(levelUpUserPokemon);
+        if (revolution) {
+            actionResult.setSay(PokemonSay.REVOLUTION);
+        }
+
+        // 저장
         userPokemonPersistence.updateHungry(userPokemon.getId(), hungry);
-
-        // 행복도 계산
-        var happy = userPokemon.getHapiness();
-        happy = limitAmount(happy + FOOD_HAPPY_AMOUNT);
-
-        userPokemonPersistence.updateHappy(userPokemon.getId(), happy);
-        userPokemonPersistence.updateStatus(userPokemon.getId(), result.getStatus());
+        userPokemonPersistence.updateStatus(userPokemon.getId(), actionResult.getStatus());
         
-        return result;
+        return actionResult;
     }
 
-    public ActionResult pat() {
+    public ActionResult pat(int userPokemonId) {
+        var userPokemon = userPokemonPersistence.getUserPokemon(userPokemonId);
+        var actionResult = new ActionResult();
+        actionResult.setStatus(PokemonStatus.NORMAL);
+        actionResult.setSay(PokemonSay.GOOD);
 
         var happy = userPokemon.getHapiness();
-        happy = limitAmount(happy + PAT_HAPPY_AMOUNT);
+        happy = limitAmount(happy + PAT);
 
-        var result = calculateHappy(happy);
+        if (happy <= 0) {
+            actionResult.setStatus(PokemonStatus.RUN);
+            actionResult.setSay(PokemonSay.LEAVE);
+        } else if (happy >= 100) {
+            actionResult.setStatus(PokemonStatus.RUN);
+            actionResult.setSay(PokemonSay.LEAVE);
+        } else if (happy >= 80) {
+            actionResult.setSay(PokemonSay.TOO_HAPPY);
+        }
+
+        var levelUpUserPokemon = levelService.exp(userPokemon, PAT_EXP);
+        var revolution = revolutionService.revolution(levelUpUserPokemon);
+        if (revolution) {
+            actionResult.setSay(PokemonSay.REVOLUTION);
+        }
+
         userPokemonPersistence.updateHappy(userPokemon.getId(), happy);
-        userPokemonPersistence.updateStatus(userPokemon.getId(), result.getStatus());
+        userPokemonPersistence.updateStatus(userPokemon.getId(), actionResult.getStatus());
 
-        return result;
+        return actionResult;
     }
 
-    public ActionResult digest() {
+    public ActionResult workout(int userPokemonId) {
+        var userPokemon = userPokemonPersistence.getUserPokemon(userPokemonId);
+        var actionResult = new ActionResult();
+        actionResult.setStatus(PokemonStatus.NORMAL);
+        actionResult.setSay(PokemonSay.WORKOUT);
 
         // 배고픔 계산
         var hungry = userPokemon.getHungry();
-        hungry = limitAmount(hungry + DIGEST_AMOUNT);
+        hungry = limitAmount(hungry + WORKOUT);
 
-        var result = calculateHungry(hungry, PokemonSay.DIGEST);
+        var levelUpUserPokemon = levelService.exp(userPokemon, WORKOUT_EXP);
+        var revolution = revolutionService.revolution(levelUpUserPokemon);
+        if (revolution) {
+            actionResult.setSay(PokemonSay.REVOLUTION);
+        }
+
+        // 저장
         userPokemonPersistence.updateHungry(userPokemon.getId(), hungry);
+        userPokemonPersistence.updateStatus(userPokemon.getId(), actionResult.getStatus());
 
-        // 행복도 계산
+        return actionResult;
+    }
+
+    public ActionResult digest(int userPokemonId) {
+        var userPokemon = userPokemonPersistence.getUserPokemon(userPokemonId);
+        var actionResult = new ActionResult();
+        actionResult.setStatus(PokemonStatus.NORMAL);
+        actionResult.setSay(PokemonSay.DIGEST);
+
+        var hungry = userPokemon.getHungry();
+        hungry = limitAmount(hungry + DIGEST);
+
+        if (hungry <= 0) {
+            actionResult.setStatus(PokemonStatus.RUN);
+            actionResult.setSay(PokemonSay.LEAVE);
+        } else if (hungry >= 100) {
+            actionResult.setStatus(PokemonStatus.DEAD);
+            actionResult.setSay(PokemonSay.DIE);
+        } else if (hungry >= 80) {
+            actionResult.setStatus(PokemonStatus.HUNGRY);
+            actionResult.setSay(PokemonSay.HUNGRY);
+        }
+
+        userPokemonPersistence.updateHungry(userPokemon.getId(), hungry);
+        userPokemonPersistence.updateStatus(userPokemon.getId(), actionResult.getStatus());
+
+        return actionResult;
+    }
+
+    public ActionResult boring(int userPokemonId) {
+        var userPokemon = userPokemonPersistence.getUserPokemon(userPokemonId);
+        var actionResult = new ActionResult();
+        actionResult.setStatus(PokemonStatus.NORMAL);
+        actionResult.setSay(PokemonSay.BORED);
+
         var happy = userPokemon.getHapiness();
-        happy = limitAmount(happy - FOOD_HAPPY_AMOUNT);
+        happy = limitAmount(happy - BORING);
+
+        if (happy <= 0) {
+            actionResult.setStatus(PokemonStatus.RUN);
+            actionResult.setSay(PokemonSay.LEAVE);
+        } else if (happy <= 10) {
+            actionResult.setStatus(PokemonStatus.SICK);
+            actionResult.setSay(PokemonSay.SICK);
+        } else if (happy <= 30) {
+            actionResult.setSay(PokemonSay.LONELY);
+        }
 
         userPokemonPersistence.updateHappy(userPokemon.getId(), happy);
-        userPokemonPersistence.updateStatus(userPokemon.getId(), result.getStatus());
-        return result;
+        userPokemonPersistence.updateStatus(userPokemon.getId(), actionResult.getStatus());
+
+        return actionResult;
+    }
+
+    public void abandon(int userPokemonId) {
+        userPokemonPersistence.deletePokemon(userPokemonId);
     }
 
     public int limitAmount(int amount) {
@@ -87,57 +187,5 @@ public class ActionService {
         }
 
         return amount;
-    }
-
-    public ActionResult calculateHungry(int hungry, PokemonSay defaultSay) {
-        var result = new ActionResult();
-        result.setStatus(PokemonStatus.NORMAL);
-        result.setSay(defaultSay);
-
-        if (hungry <= 0) {
-            result.setStatus(PokemonStatus.DEAD);
-            result.setSay(PokemonSay.TOO_FULL);
-        } else if (hungry <= HUNGRY_AMOUNT) {
-            result.setStatus(PokemonStatus.SICK);
-            result.setSay(PokemonSay.FULL);
-        } else if (hungry >= 100) {
-            result.setStatus(PokemonStatus.HUNGRY);
-            result.setSay(PokemonSay.HUNGRY);
-        }
-
-        return result;
-    }
-
-    public ActionResult calculateHappy(int happy) {
-        var result = new ActionResult();
-        result.setStatus(PokemonStatus.NORMAL);
-        result.setSay(PokemonSay.GOOD);
-
-        if (happy <= 0) {
-            result.setStatus(PokemonStatus.RUN);
-            result.setSay(PokemonSay.LEAVE);
-        } else if (happy <= PAT_HAPPY_AMOUNT) {
-            result.setStatus(PokemonStatus.SICK);
-            result.setSay(PokemonSay.LONELY);
-        } else if (happy >= 100) {
-            result.setSay(PokemonSay.TOO_HAPPY);
-        }
-
-        return result;
-    }
-
-    public boolean checkRevolution() {
-        var hungry = userPokemon.getHungry();
-        var happy = userPokemon.getHapiness();
-
-        return hungry >= 0 && hungry <= 10 && happy <= 100 && happy >= 90;
-    }
-
-    public ActionResult revolution() {
-        var result = new ActionResult();
-        result.setStatus(PokemonStatus.NORMAL);
-        result.setSay(PokemonSay.REVOLUTION);
-
-        return result;
     }
 }

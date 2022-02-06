@@ -14,42 +14,49 @@ import java.util.Objects;
 public class UserPokemonPersistence {
 
     public int countUserPokemon(int userId) {
-        StringBuilder sql = new StringBuilder();
+        var dbUtil = new DBUtil();
+        var sql = new StringBuilder();
         sql.append("SELECT COUNT(ownerId) AS cnt ");
         sql.append("FROM tb_pokemon_detail ");
         sql.append("WHERE ownerId = '");
         sql.append(userId);
         sql.append("'");
-
         System.out.println(sql);
 
         try {
             var count = 0;
-            var resultSet = DBUtil.select(sql.toString());
+            var resultSet = dbUtil.select(sql.toString());
             if (resultSet.next()) {
                 count = resultSet.getInt("cnt");
             }
 
+            dbUtil.resultSetClose();
             return count;
         } catch (SQLException e) {
             e.printStackTrace();
+            dbUtil.resultSetClose();
         }
 
         return 0;
     }
 
     public boolean addPokemon(UserPokemon userPokemon) {
-
+        var dbUtil = new DBUtil();
+        var result = false;
         var main = userPokemon.isMain() ? 1 : 0;
 
-        StringBuilder sql = new StringBuilder();
+        var sql = new StringBuilder();
         sql.append("INSERT INTO tb_pokemon_detail (");
-        sql.append("ownerId, pokemonId, isMain, status, nickname, hapiness, hungry, catchedAt");
+        sql.append("ownerId, pokemonId, level, exp, isMain, status, nickname, hapiness, hungry, catchedAt");
         sql.append(") VALUES ('");
         sql.append(userPokemon.getOwnerId());
         sql.append("', '");
         sql.append(userPokemon.getPokemonId());
         sql.append("', ");
+        sql.append(userPokemon.getLevel());
+        sql.append(", ");
+        sql.append(userPokemon.getExp());
+        sql.append(", ");
         sql.append(main);
         sql.append(", '");
         sql.append(userPokemon.getStatus().getCode());
@@ -65,19 +72,25 @@ public class UserPokemonPersistence {
 
         System.out.println(sql);
 
-        return DBUtil.insert(sql.toString());
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
     }
 
     public UserPokemon getUserPokemon(int userPokemonId) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT pd.* ");
+        var dbUtil = new DBUtil();
+        var sql = new StringBuilder();
+        sql.append("SELECT pd.*, p.serialNumber ");
         sql.append("FROM tb_pokemon_detail as pd ");
-        sql.append("WHERE pd.ownerId = ");
+        sql.append("LEFT JOIN tb_pokemon as p ");
+        sql.append("ON pd.pokemonId = p.id ");
+        sql.append("WHERE pd.id = ");
         sql.append(userPokemonId);
-
         System.out.println(sql);
-        var result = DBUtil.select(sql.toString());
+
+        var result = dbUtil.select(sql.toString());
         if (Objects.isNull(result)) {
+            dbUtil.resultSetClose();
             return null;
         }
 
@@ -87,6 +100,9 @@ public class UserPokemonPersistence {
                 pokemon.setId(result.getInt("id"));
                 pokemon.setOwnerId(result.getInt("ownerId"));
                 pokemon.setPokemonId(result.getInt("pokemonId"));
+                pokemon.setPokemonCode(result.getString("serialNumber"));
+                pokemon.setLevel(result.getInt("level"));
+                pokemon.setExp(result.getInt("exp"));
                 pokemon.setMain(result.getInt("isMain") > 0);
                 pokemon.setStatus(PokemonStatus.valueOf(result.getString("status")));
                 pokemon.setHapiness(result.getInt("hapiness"));
@@ -94,15 +110,18 @@ public class UserPokemonPersistence {
                 pokemon.setCatchedAt(LocalDateTime.parse(result.getString("catchedAt"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             }
 
+            dbUtil.resultSetClose();
             return pokemon;
         } catch (SQLException e) {
             e.printStackTrace();
+            dbUtil.resultSetClose();
             return null;
         }
     }
 
     public UserPokemon getMainPokemon(int userId) {
-        StringBuilder sql = new StringBuilder();
+        var dbUtil = new DBUtil();
+        var sql = new StringBuilder();
         sql.append("SELECT pd.*, p.serialNumber, p.pokemonName ");
         sql.append("FROM tb_pokemon_detail as pd ");
         sql.append("LEFT JOIN tb_pokemon as p ");
@@ -110,9 +129,9 @@ public class UserPokemonPersistence {
         sql.append("WHERE pd.ownerId = ");
         sql.append(userId);
         sql.append(" AND pd.isMain = '1' ");
-
         System.out.println(sql);
-        var result = DBUtil.select(sql.toString());
+
+        var result = dbUtil.select(sql.toString());
         if (Objects.isNull(result)) {
             return null;
         }
@@ -124,6 +143,8 @@ public class UserPokemonPersistence {
                 pokemon.setOwnerId(result.getInt("ownerId"));
                 pokemon.setPokemonId(result.getInt("pokemonId"));
                 pokemon.setPokemonCode(result.getString("serialNumber"));
+                pokemon.setLevel(result.getInt("level"));
+                pokemon.setExp(result.getInt("exp"));
                 pokemon.setOriginName(result.getString("pokemonName"));
                 pokemon.setMain(result.getInt("isMain") > 0);
                 pokemon.setStatus(PokemonStatus.valueOf(result.getString("status")));
@@ -132,25 +153,29 @@ public class UserPokemonPersistence {
                 pokemon.setCatchedAt(LocalDateTime.parse(result.getString("catchedAt"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             }
 
+            dbUtil.resultSetClose();
             return pokemon;
         } catch (SQLException e) {
             e.printStackTrace();
+            dbUtil.resultSetClose();
             return null;
         }
     }
 
     public List<UserPokemon> getUserPokemons(int userId) {
-        StringBuilder sql = new StringBuilder();
+        var dbUtil = new DBUtil();
+        var sql = new StringBuilder();
         sql.append("SELECT pd.*, p.serialNumber, p.pokemonName ");
         sql.append("FROM tb_pokemon_detail as pd ");
         sql.append("LEFT JOIN tb_pokemon as p ");
         sql.append("ON pd.pokemonId = p.id ");
         sql.append("WHERE pd.ownerId = ");
         sql.append(userId);
-
         System.out.println(sql);
-        var result = DBUtil.select(sql.toString());
+
+        var result = dbUtil.select(sql.toString());
         if (Objects.isNull(result)) {
+            dbUtil.resultSetClose();
             return null;
         }
 
@@ -161,6 +186,8 @@ public class UserPokemonPersistence {
                 pokemon.setId(result.getInt("id"));
                 pokemon.setOwnerId(result.getInt("ownerId"));
                 pokemon.setPokemonId(result.getInt("pokemonId"));
+                pokemon.setLevel(result.getInt("level"));
+                pokemon.setExp(result.getInt("exp"));
                 pokemon.setPokemonCode(result.getString("serialNumber"));
                 pokemon.setOriginName(result.getString("pokemonName"));
                 pokemon.setMain(result.getInt("isMain") > 0);
@@ -172,15 +199,67 @@ public class UserPokemonPersistence {
                 pokemons.add(pokemon);
             }
 
+            dbUtil.resultSetClose();
             return pokemons;
         } catch (SQLException e) {
             e.printStackTrace();
+            dbUtil.resultSetClose();
             return null;
         }
     }
 
+    public boolean updatePokemonId(int userPokemonId, int pokemonId) {
+        var dbUtil = new DBUtil();
+        var result = false;
+        var sql = new StringBuilder();
+        sql.append("UPDATE tb_pokemon_detail ");
+        sql.append("SET pokemonId = ");
+        sql.append(pokemonId);
+        sql.append(" WHERE id = ");
+        sql.append(userPokemonId);
+        System.out.println(sql);
+
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
+    }
+
+    public boolean updateExp(int userPokemonId, int exp) {
+        var dbUtil = new DBUtil();
+        var result = false;
+        var sql = new StringBuilder();
+        sql.append("UPDATE tb_pokemon_detail ");
+        sql.append("SET exp = ");
+        sql.append(exp);
+        sql.append(" WHERE id = ");
+        sql.append(userPokemonId);
+        System.out.println(sql);
+
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
+    }
+
+    public boolean updateLevel(int userPokemonId, int level) {
+        var dbUtil = new DBUtil();
+        var result = false;
+        var sql = new StringBuilder();
+        sql.append("UPDATE tb_pokemon_detail ");
+        sql.append("SET level = ");
+        sql.append(level);
+        sql.append(" WHERE id = ");
+        sql.append(userPokemonId);
+        System.out.println(sql);
+
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
+    }
+
     public boolean updateHappy(int userPokemonId, int amount) {
-        StringBuilder sql = new StringBuilder();
+        var dbUtil = new DBUtil();
+        var result = false;
+        var sql = new StringBuilder();
         sql.append("UPDATE tb_pokemon_detail ");
         sql.append("SET ");
         sql.append("hapiness = " + amount);
@@ -188,11 +267,15 @@ public class UserPokemonPersistence {
         sql.append("id = " + userPokemonId);
         System.out.println(sql);
 
-        return DBUtil.insert(sql.toString());
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
     }
 
     public boolean updateHungry(int userPokemonId, int amount) {
-        StringBuilder sql = new StringBuilder();
+        var dbUtil = new DBUtil();
+        var result = false;
+        var sql = new StringBuilder();
         sql.append("UPDATE tb_pokemon_detail ");
         sql.append("SET ");
         sql.append("hungry = " + amount);
@@ -200,11 +283,15 @@ public class UserPokemonPersistence {
         sql.append("id = " + userPokemonId);
         System.out.println(sql);
 
-        return DBUtil.insert(sql.toString());
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
     }
 
     public boolean updateStatus(int userPokemonId, PokemonStatus status) {
-        StringBuilder sql = new StringBuilder();
+        var dbUtil = new DBUtil();
+        var result = false;
+        var sql = new StringBuilder();
         sql.append("UPDATE tb_pokemon_detail ");
         sql.append("SET ");
         sql.append("status = '");
@@ -213,6 +300,20 @@ public class UserPokemonPersistence {
         sql.append("id = " + userPokemonId);
         System.out.println(sql);
 
-        return DBUtil.insert(sql.toString());
+        result = dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
+        return result;
+    }
+
+    public void deletePokemon(int userPokemonId) {
+        var dbUtil = new DBUtil();
+        var sql = new StringBuilder();
+        sql.append("DELETE FROM tb_pokemon_detail ");
+        sql.append("WHERE ");
+        sql.append("id = " + userPokemonId);
+        System.out.println(sql);
+
+        dbUtil.insert(sql.toString());
+        dbUtil.insertClose();
     }
 }

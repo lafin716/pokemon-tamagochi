@@ -5,8 +5,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "FeedServlet", urlPatterns = "/action/feed")
-public class FeedServlet extends ActionServlet {
+@WebServlet(name = "WorkoutServlet", urlPatterns = "/action/workout")
+public class WorkoutServlet extends ActionServlet {
 
     @Override
     public void init() throws ServletException {
@@ -16,7 +16,7 @@ public class FeedServlet extends ActionServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
         super.doPost(req, resp);
-        var result = actionService.feed(userPokemonId);
+        var result = actionService.workout(userPokemonId);
         var userPokemon = userService.getPokemon(userPokemonId);
 
         req.setAttribute("actionResult", result);
